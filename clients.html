@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/api.js" defer></script>
+    <script src="js/clients.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Gestion des clients</h1>
+            <nav class="nav">
+                <a href="index.html">Accueil</a>
+                <a href="categories.html">Catégories</a>
+                <a href="produits.html">Produits</a>
+                <a href="clients.html">Clients</a>
+                <a href="commandes.html">Commandes</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="form-section">
+            <h2>Ajouter un client</h2>
+            <form id="client-form">
+                <div class="form-group">
+                    <label for="id_client">ID client</label>
+                    <input type="number" id="id_client" name="id_client" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nom">Nom</label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Courriel</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mot_de_passe">Mot de passe</label>
+                    <input type="password" id="mot_de_passe" name="mot_de_passe" required>
+                </div>
+
+                <button type="submit" class="btn">Ajouter</button>
+            </form>
+        </section>
+
+        <section class="table-section">
+            <h2>Liste des clients</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Courriel</th>
+                        <th>Mot de passe</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="clients-body">
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>
