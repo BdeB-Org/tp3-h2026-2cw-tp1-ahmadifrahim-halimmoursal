@@ -1,43 +1,73 @@
-let form = document.getElementById("commande-form");
-let body = document.getElementById("commandes-body");
+const commandeForm = document.getElementById("commande-form");
+const commandesBody = document.getElementById("commandes-body");
 
-async function afficherCommandes() {
-    let commandes = await getAll(URL_COMMANDE);
-    body.innerHTML = "";
+async function chargerCommandes() {
+    try {
+        const commandes = await getAll(ENDPOINTS.commandes);
+        commandesBody.innerHTML = "";
 
-    for (let commande of commandes) {
-        body.innerHTML += `
-            <tr>
+        commandes.forEach(commande => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
                 <td>${commande.id_commande}</td>
                 <td>${commande.date_commande}</td>
                 <td>${commande.total}</td>
                 <td>${commande.id_client}</td>
                 <td>
-                    <button onclick="supprimerCommande(${commande.id_commande})">Supprimer</button>
+                    <button class="action-btn delete-btn" onclick="supprimerCommande('${commande.id_commande}')">Supprimer</button>
                 </td>
-            </tr>
-        `;
+            `;
+
+            commandesBody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error(error);
+        alert("Erreur lors du chargement des commandes : " + error.message);
     }
 }
 
-form.addEventListener("submit", async function(e) {
+commandeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    let commande = {
+    const dateInput = document.getElementById("date_commande").value; // format YYYY-MM-DD from <input type=date>
+    let dateNumeric = null;
+    if (dateInput) {
+        // convert YYYY-MM-DD -> YYYYMMDD (number) to satisfy backends expecting numeric date
+        dateNumeric = Number(dateInput.replace(/-/g, ''));
+    }
+
+    const nouvelleCommande = {
         id_commande: document.getElementById("id_commande").value,
-        date_commande: document.getElementById("date_commande").value,
-        total: document.getElementById("total").value,
-        id_client: document.getElementById("id_client").value
+        commande_id: document.getElementById("id_commande").value,
+        // send numeric date as primary field to match server expectations
+        date_commande: dateNumeric !== null ? dateNumeric : document.getElementById("date_commande").value,
+        // also include ISO date string under an alternate key
+        date: dateInput,
+        total: parseFloat(document.getElementById("total").value) || 0,
+        id_client: Number(document.getElementById("id_client").value) || document.getElementById("id_client").value,
+        client_id: Number(document.getElementById("id_client").value) || document.getElementById("id_client").value
     };
 
-    await create(URL_COMMANDE, commande);
-    form.reset();
-    afficherCommandes();
+    console.log('Envoi nouvelle commande:', nouvelleCommande);
+
+    try {
+        await create(ENDPOINTS.commandes, nouvelleCommande);
+        commandeForm.reset();
+        chargerCommandes();
+    } catch (error) {
+        console.error(error);
+        alert("Erreur lors de l'ajout de la commande : " + error.message);
+    }
 });
 
 async function supprimerCommande(id) {
-    await remove(URL_COMMANDE, id);
-    afficherCommandes();
+    try {
+        await remove(ENDPOINTS.commandes, id);
+        chargerCommandes();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-afficherCommandes();
+chargerCommandes();

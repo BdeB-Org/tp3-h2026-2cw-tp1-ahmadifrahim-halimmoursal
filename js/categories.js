@@ -1,39 +1,55 @@
-let form = document.getElementById("categorie-form");
-let body = document.getElementById("categories-body");
+const categorieForm = document.getElementById("categorie-form");
+const categoriesBody = document.getElementById("categories-body");
 
-async function afficherCategories() {
-    let categories = await getAll(URL_CATEGORIE);
-    body.innerHTML = "";
+async function chargerCategories() {
+    try {
+        const categories = await getAll(ENDPOINTS.categories);
+        categoriesBody.innerHTML = "";
 
-    for (let categorie of categories) {
-        body.innerHTML += `
-            <tr>
+        categories.forEach(categorie => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
                 <td>${categorie.id_categorie}</td>
                 <td>${categorie.nom}</td>
                 <td>
-                    <button onclick="supprimerCategorie(${categorie.id_categorie})">Supprimer</button>
+                    <button class="action-btn delete-btn" onclick="supprimerCategorie(${categorie.id_categorie})">
+                        Supprimer
+                    </button>
                 </td>
-            </tr>
-        `;
+            `;
+
+            categoriesBody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error(error);
     }
 }
 
-form.addEventListener("submit", async function(e) {
-    e.preventDefault();
+categorieForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-    let categorie = {
+    const nouvelleCategorie = {
         id_categorie: document.getElementById("id_categorie").value,
         nom: document.getElementById("nom").value
     };
 
-    await create(URL_CATEGORIE, categorie);
-    form.reset();
-    afficherCategories();
+    try {
+        await create(ENDPOINTS.categories, nouvelleCategorie);
+        categorieForm.reset();
+        chargerCategories();
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 async function supprimerCategorie(id) {
-    await remove(URL_CATEGORIE, id);
-    afficherCategories();
+    try {
+        await remove(ENDPOINTS.categories, id);
+        chargerCategories();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-afficherCategories();
+chargerCategories();

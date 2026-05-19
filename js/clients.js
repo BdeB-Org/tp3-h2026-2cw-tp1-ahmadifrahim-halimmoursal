@@ -1,49 +1,57 @@
-let form = document.getElementById("client-form");
-let body = document.getElementById("clients-body");
+const clientForm = document.getElementById("client-form");
+const clientsBody = document.getElementById("clients-body");
 
-async function afficherClients() {
-    let clients = await getAll(URL_CLIENT);
-    body.innerHTML = "";
+async function chargerClients() {
+    try {
+        const clients = await getAll(ENDPOINTS.clients);
+        clientsBody.innerHTML = "";
 
-    for (let client of clients) {
-        body.innerHTML += `
-            <tr>
+        clients.forEach(client => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
                 <td>${client.id_client}</td>
-                <td>${client.nom_client}</td>
-                <td>${client.adresse}</td>
-                <td>${client.pays}</td>
-                <td>${client.telephone}</td>
-                <td>${client.vendeur}</td>
-                <td>${client.region}</td>
+                <td>${client.nom}</td>
+                <td>${client.email}</td>
+                <td>${client.mot_de_passe}</td>
                 <td>
-                    <button onclick="supprimerClient(${client.id_client})">Supprimer</button>
+                    <button class="action-btn delete-btn" onclick="supprimerClient(${client.id_client})">Supprimer</button>
                 </td>
-            </tr>
-        `;
+            `;
+
+            clientsBody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error(error);
     }
 }
 
-form.addEventListener("submit", async function(e) {
+clientForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    let client = {
+    const nouveauClient = {
         id_client: document.getElementById("id_client").value,
-        nom_client: document.getElementById("nom_client").value,
-        adresse: document.getElementById("adresse").value,
-        pays: document.getElementById("pays").value,
-        telephone: document.getElementById("telephone").value,
-        vendeur: document.getElementById("vendeur").value,
-        region: document.getElementById("region").value
+        nom: document.getElementById("nom").value,
+        email: document.getElementById("email").value,
+        mot_de_passe: document.getElementById("mot_de_passe").value
     };
 
-    await create(URL_CLIENT, client);
-    form.reset();
-    afficherClients();
+    try {
+        await create(ENDPOINTS.clients, nouveauClient);
+        clientForm.reset();
+        chargerClients();
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 async function supprimerClient(id) {
-    await remove(URL_CLIENT, id);
-    afficherClients();
+    try {
+        await remove(ENDPOINTS.clients, id);
+        chargerClients();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-afficherClients();
+chargerClients();
