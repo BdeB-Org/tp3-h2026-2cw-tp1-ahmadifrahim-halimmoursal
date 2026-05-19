@@ -1,73 +1,48 @@
-const API_BASE = "http://localhost:8080/ords/commande";
+const BASE_URL = "http://localhost:8080/ords/commande";
 
-const ENDPOINTS = {
-    categories: `${API_BASE}/categorie/`,
-    clients: `${API_BASE}/client/`,
-    produits: `${API_BASE}/produit/`,
-    commandes: `${API_BASE}/commande/`
-};
+const URL_CATEGORIE = BASE_URL + "/categorie/";
+const URL_CLIENT = BASE_URL + "/client/";
+const URL_PRODUIT = BASE_URL + "/produit/";
+const URL_COMMANDE = BASE_URL + "/commande/";
 
-async function getAll(endpoint) {
-    const response = await fetch(endpoint);
-
-    if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des données.");
-    }
-
-    const data = await response.json();
-    return data.items || [];
+async function getAll(url) {
+    let reponse = await fetch(url);
+    let data = await reponse.json();
+    return data.items;
 }
 
-async function getById(endpoint, id) {
-    const response = await fetch(`${endpoint}${id}`);
-
-    if (!response.ok) {
-        throw new Error("Erreur lors de la récupération de l'élément.");
-    }
-
-    return await response.json();
+async function getById(url, id) {
+    let reponse = await fetch(url + id);
+    let data = await reponse.json();
+    return data;
 }
 
-async function create(endpoint, element) {
-    const response = await fetch(endpoint, {
+async function create(url, objet) {
+    let reponse = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(element)
+        body: JSON.stringify(objet)
     });
 
-    if (!response.ok) {
-        throw new Error("Erreur lors de l'ajout.");
-    }
-
-    return await response.json();
+    return await reponse.json();
 }
 
-async function update(endpoint, id, element) {
-    const response = await fetch(`${endpoint}${id}`, {
+async function update(url, id, objet) {
+    let reponse = await fetch(url + id, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(element)
+        body: JSON.stringify(objet)
     });
 
-    if (!response.ok) {
-        throw new Error("Erreur lors de la modification.");
-    }
-
-    return await response.json();
+    return await reponse.json();
 }
 
-async function remove(endpoint, id) {
-    const response = await fetch(`${endpoint}${id}`, {
+async function remove(url, id) {
+    await fetch(url + id, {
         method: "DELETE"
     });
-
-    if (!response.ok) {
-        throw new Error("Erreur lors de la suppression.");
-    }
-
-    return true;
 }
